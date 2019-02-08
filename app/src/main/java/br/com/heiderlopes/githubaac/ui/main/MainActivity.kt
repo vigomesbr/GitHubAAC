@@ -1,7 +1,8 @@
-package br.com.heiderlopes.githubaac
+package br.com.heiderlopes.githubaac.ui.main
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import br.com.heiderlopes.githubaac.R
 
 class MainActivity : AppCompatActivity() {
 
