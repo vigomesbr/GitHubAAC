@@ -1,30 +1,64 @@
-package br.com.heiderlopes.githubaac.ui.userprofile
-
-
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+import android.arch.lifecycle.ViewModelProvider
+import javax.inject.Inject
+import android.support.annotation.Nullable
+import android.arch.lifecycle.ViewModelProviders
 import br.com.heiderlopes.githubaac.R
+import dagger.android.support.AndroidSupportInjection
+import br.com.heiderlopes.githubaac.data.local.entity.User
+import br.com.heiderlopes.githubaac.ui.userprofile.UserProfileViewModel
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.fragment_user_profile.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- *
- */
 class UserProfileFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: UserProfileViewModel
+
+    override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_user_profile, container, false)
     }
 
+    override fun onActivityCreated(@Nullable savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        this.configureDagger()
+        this.configureViewModel()
+        this.setUpView()
+    }
 
+    private fun setUpView() {
+        btPesquisar.setOnClickListener {
+            viewModel.pesquisar(etUsername.text.toString())
+            viewModel.user.observe(this, Observer {
+                updateUI(it)
+            })
+        }
+    }
+
+    private fun configureDagger() {
+        AndroidSupportInjection.inject(this)
+    }
+
+    private fun configureViewModel() {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(UserProfileViewModel::class.java)
+    }
+
+    private fun updateUI(user: User?) {
+
+        if (user != null) {
+            Picasso.get().load(user.avatarURL).into(ivUsuario)
+            tvUsuario.text = user.login
+        }
+    }
 }
